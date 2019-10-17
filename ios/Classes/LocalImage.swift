@@ -9,7 +9,9 @@ import Foundation
 
 public struct LocalImage:Codable {
     public var id: String
-    public var creationDate: String
+    public var creationDate: Int
     public var pixelWidth: Int
     public var pixelHeight: Int
+    public var lat: Double
+    public var lon: Double
 }
