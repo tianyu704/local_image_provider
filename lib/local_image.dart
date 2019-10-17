@@ -16,8 +16,11 @@ class LocalImage {
   final int pixelWidth;
   final int pixelHeight;
   String creationDate;
+  final num lon;
+  final num lat;
 
-  LocalImage(this.id, this.creationDate, this.pixelWidth, this.pixelHeight);
+  LocalImage(this.id, this.creationDate, this.pixelWidth, this.pixelHeight,
+      this.lon, this.lat);
 
   /// Returns a jpeg of the image that can be loaded into a [MemoryImage].
   ///
@@ -30,5 +33,6 @@ class LocalImage {
 
   factory LocalImage.fromJson(Map<String, dynamic> json) =>
       _$LocalImageFromJson(json);
+
   Map<String, dynamic> toJson() => _$LocalImageToJson(this);
 }

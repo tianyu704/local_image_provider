@@ -62,8 +62,10 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void switchAlbum( LocalAlbum album ) async {
-    List<LocalImage> albumImages = await localImageProvider.findImagesInAlbum(album.id, 100 );
+  void switchAlbum(LocalAlbum album) async {
+    List<LocalImage> albumImages =
+        await localImageProvider.findImagesInAlbum(album.id, 100);
+//    List<LocalImage> albumImages = await localImageProvider.findLatest(100000);
     setState(() {
       _localImages.clear();
       _localImages.addAll(albumImages);
@@ -108,7 +110,7 @@ class _MyAppState extends State<MyApp> {
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),
                                 child: Text(
-                                    'Id: ${img.id}; created: ${img.creationDate}'),
+                                    'Id: ${img.id}; created: ${img.creationDate}; lon:${img.lon}; lat:${img.lat}'),
                               ),
                             ),
                           )
@@ -122,8 +124,7 @@ class _MyAppState extends State<MyApp> {
                       children: _localAlbums
                           .map(
                             (album) => GestureDetector(
-                                onTap: () =>
-                                    switchAlbum(album),
+                                onTap: () => switchAlbum(album),
                                 child: Container(
                                   padding: EdgeInsets.symmetric(vertical: 5),
                                   child: Text(

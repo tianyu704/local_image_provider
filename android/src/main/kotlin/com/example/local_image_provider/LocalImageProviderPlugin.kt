@@ -237,6 +237,8 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             val dateColumn = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_TAKEN)
             val titleColumn = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.TITLE)
             val idColumn = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID)
+            val lon = imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE)
+            val lat = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.LATITUDE)
             while (imageCursor.moveToNext()) {
                 val imgJson = JSONObject()
                 imgJson.put("title", imageCursor.getString(titleColumn))
@@ -246,6 +248,8 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 val takenOn = Date(imageCursor.getLong(dateColumn))
                 val isoDate = isoFormatter.format(takenOn)
                 imgJson.put("creationDate", isoDate)
+                imgJson.put("lon",lon)
+                imgJson.put("lat",lat)
                 images.add(imgJson.toString())
             }
         }
