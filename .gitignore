@@ -8,7 +8,7 @@
 build/
 res/
 lib/generated/
-
+example/lib/generated/
 .DS_Store
 .dart_tool/
 
