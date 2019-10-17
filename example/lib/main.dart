@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
     try {
       hasPermission = await localImageProvider.initialize();
       if (hasPermission) {
-        localImages = await localImageProvider.findLatest(2);
+        localImages = await localImageProvider.findLatestAfterTime();
         localAlbums = await localImageProvider.findAlbums(LocalAlbumType.all);
       }
     } on PlatformException catch (e) {
@@ -100,7 +100,17 @@ class _MyAppState extends State<MyApp> {
                     style: TextStyle(fontSize: 24),
                   ),
                   Divider(),
-                  Text('Images', style: TextStyle(fontSize: 20)),
+                  Row(
+                    children: <Widget>[
+                      Text('Images', style: TextStyle(fontSize: 20)),
+                      RaisedButton(
+                        child: Text("Load More"),
+                        onPressed: () {
+                          _loadMore();
+                        },
+                      ),
+                    ],
+                  ),
                   Expanded(
                     child: ListView(
                       children: _localImages
@@ -110,7 +120,7 @@ class _MyAppState extends State<MyApp> {
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),
                                 child: Text(
-                                    'Id: ${img.id}; created: ${img.creationDate}; lon:${img.lon}; lat:${img.lat}'),
+                                    'Id: ${img.id}; created: ${img.creationDate}; lon:${img.lon}; lat:${img.lat}; path:${img.path}'),
                               ),
                             ),
                           )
@@ -157,5 +167,16 @@ class _MyAppState extends State<MyApp> {
             : Center(child: Text('No permission')),
       ),
     );
+  }
+
+  void _loadMore() async {
+    num time = 0;
+    if (_localImages != null && _localImages.length > 0) {
+      time = _localImages[_localImages.length - 1].creationDate;
+    }
+    List<LocalImage> more =
+        await localImageProvider.findLatestAfterTime(time: time);
+    _localImages.addAll(more);
+    setState(() {});
   }
 }

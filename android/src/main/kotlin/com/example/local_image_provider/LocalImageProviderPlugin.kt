@@ -75,9 +75,12 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 }
             }
             "latest_images_after_time" -> {
-                val time = call.argument<Long>("time")
+                var time = call.argument<Any>("time")
                 val num = call.argument<Int>("num")
                 val needLocation = call.argument<Int>("needLocation")
+                if (time is Int) {
+                    time = time.toLong()
+                }
                 getLatestImagesAfterId(time as Long, num as Int, needLocation as Int, result)
             }
             "albums" -> {
@@ -226,11 +229,19 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         Thread(Runnable {
             val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC LIMIT $num"
-            var selection :String? = null
-            var selectionArgs :Array<String>? = null
-            if (!time.equals(0)) {
-                selection = "${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
-                selectionArgs = arrayOf(time.toString())
+            var selection: String? = null
+            var selectionArgs: Array<String>? = null
+            if (time != 0L) {
+                if (needLocation == 1) {
+                    selection = "${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                } else {
+                    selection = "${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                }
+                selectionArgs = arrayOf("$time")
+            } else {
+                if (needLocation == 1) {
+                    selection = "${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                }
             }
             val mediaResolver = pluginActivity.contentResolver
             val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
@@ -275,9 +286,9 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 imgJson.put("pixelHeight", imageCursor.getInt(heightColumn))
                 imgJson.put("id", imageCursor.getString(idColumn))
                 imgJson.put("creationDate", imageCursor.getLong(dateColumn))
-                imgJson.put("lon", imageCursor.getFloat(lon))
-                imgJson.put("lat", imageCursor.getFloat(lat))
-                imgJson.put("path", imageCursor.getFloat(path))
+                imgJson.put("lon", imageCursor.getDouble(lon))
+                imgJson.put("lat", imageCursor.getDouble(lat))
+                imgJson.put("path", imageCursor.getString(path))
                 images.add(imgJson.toString())
             }
         }

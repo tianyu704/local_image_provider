@@ -19,8 +19,11 @@ class LocalImage {
   final num lon;
   final num lat;
 
+  /// Only Android
+  final String path;
+
   LocalImage(this.id, this.creationDate, this.pixelWidth, this.pixelHeight,
-      this.lon, this.lat);
+      this.lon, this.lat, this.path);
 
   /// Returns a jpeg of the image that can be loaded into a [MemoryImage].
   ///
