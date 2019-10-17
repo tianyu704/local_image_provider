@@ -68,21 +68,18 @@ class LocalImageProvider {
     return _jsonToLocalImages(images);
   }
 
-  /// Returns the newest images after albumId on the local device up to [maxImages] in length.
+  /// Returns the newest images after [time] on the local device up to [num] in length.
   ///
   /// This list may be empty if there are no images on the device or the
   /// user has denied permission to see their local images.
-  Future<List<LocalImage>> findLatestAfterId(String albumId, int maxImages,
-      {bool needLocation = true}) async {
+  Future<List<LocalImage>> findLatestAfterTime(
+      {num time = 0, int num = 50, bool needLocation = true}) async {
     if (!_initWorked) {
       throw LocalImageProviderNotInitializedException();
     }
     final List<dynamic> images = await channel.invokeMethod(
-        'latest_images_after_id', {
-      'albumId': albumId,
-      'maxImages': maxImages,
-      'needLocation': needLocation ? 1 : 0
-    });
+        'latest_images_after_time',
+        {'time': time, 'num': num, 'needLocation': needLocation ? 1 : 0});
     return _jsonToLocalImages(images);
   }
 

@@ -15,7 +15,7 @@ class LocalImage {
   final String id;
   final int pixelWidth;
   final int pixelHeight;
-  String creationDate;
+  final num creationDate;
   final num lon;
   final num lat;
 

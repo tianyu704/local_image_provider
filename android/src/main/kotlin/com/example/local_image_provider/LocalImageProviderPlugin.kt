@@ -43,14 +43,14 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
     private var initializedSuccessfully: Boolean = false
     private var permissionGranted: Boolean = false
     private val imageColums = arrayOf(MediaStore.Images.ImageColumns.DISPLAY_NAME,
-        MediaStore.Images.ImageColumns.DATE_TAKEN,
-        MediaStore.Images.ImageColumns.TITLE,
-        MediaStore.Images.ImageColumns.HEIGHT,
-        MediaStore.Images.ImageColumns.WIDTH,
-        MediaStore.Images.ImageColumns.LONGITUDE,
-        MediaStore.Images.ImageColumns.LATITUDE,
-        MediaStore.Images.ImageColumns.DATA,
-        MediaStore.MediaColumns._ID)
+            MediaStore.Images.ImageColumns.DATE_TAKEN,
+            MediaStore.Images.ImageColumns.TITLE,
+            MediaStore.Images.ImageColumns.HEIGHT,
+            MediaStore.Images.ImageColumns.WIDTH,
+            MediaStore.Images.ImageColumns.LONGITUDE,
+            MediaStore.Images.ImageColumns.LATITUDE,
+            MediaStore.Images.ImageColumns.DATA,
+            MediaStore.MediaColumns._ID)
 
     companion object {
         @JvmStatic
@@ -73,6 +73,12 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                     result.error(LocalImageProviderErrors.missingOrInvalidArg.name,
                             "Missing arg maxPhotos", null)
                 }
+            }
+            "latest_images_after_time" -> {
+                val time = call.argument<Long>("time")
+                val num = call.argument<Int>("num")
+                val needLocation = call.argument<Int>("needLocation")
+                getLatestImagesAfterId(time as Long, num as Int, needLocation as Int, result)
             }
             "albums" -> {
                 if (null != call.arguments && call.arguments is Int) {
@@ -208,7 +214,26 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC LIMIT $maxResults"
             val mediaResolver = pluginActivity.contentResolver
-            val images = findImagesToJson(mediaResolver, imgUri, null, null, sortOrder )
+            val images = findImagesToJson(mediaResolver, imgUri, null, null, sortOrder)
+            pluginActivity.runOnUiThread { result.success(images) }
+        }).start()
+    }
+
+    private fun getLatestImagesAfterId(time: Long, num: Int, needLocation: Int, result: Result) {
+        if (isNotInitialized(result)) {
+            return
+        }
+        Thread(Runnable {
+            val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC LIMIT $num"
+            var selection :String? = null
+            var selectionArgs :Array<String>? = null
+            if (!time.equals(0)) {
+                selection = "${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                selectionArgs = arrayOf(time.toString())
+            }
+            val mediaResolver = pluginActivity.contentResolver
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
     }
@@ -223,13 +248,13 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             val selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = ?"
             val selectionArgs = arrayOf(albumId)
             val mediaResolver = pluginActivity.contentResolver
-            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder )
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
     }
 
     private fun findImagesToJson(mediaResolver: ContentResolver, imgUri: Uri, selection: String?,
-                                 selectionArgs: Array<String>?, sortOrder: String? ):
+                                 selectionArgs: Array<String>?, sortOrder: String?):
             ArrayList<String> {
         val images = ArrayList<String>()
         val imageCursor = mediaResolver.query(imgUri, imageColums, selection,
@@ -249,12 +274,10 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 imgJson.put("pixelWidth", imageCursor.getInt(widthColumn))
                 imgJson.put("pixelHeight", imageCursor.getInt(heightColumn))
                 imgJson.put("id", imageCursor.getString(idColumn))
-                val takenOn = Date(imageCursor.getLong(dateColumn))
-                val isoDate = isoFormatter.format(takenOn)
-                imgJson.put("creationDate", isoDate)
-                imgJson.put("lon",imageCursor.getFloat(lon))
-                imgJson.put("lat",imageCursor.getFloat(lat))
-                imgJson.put("path",imageCursor.getFloat(path))
+                imgJson.put("creationDate", imageCursor.getLong(dateColumn))
+                imgJson.put("lon", imageCursor.getFloat(lon))
+                imgJson.put("lat", imageCursor.getFloat(lat))
+                imgJson.put("path", imageCursor.getFloat(path))
                 images.add(imgJson.toString())
             }
         }

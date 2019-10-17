@@ -9,7 +9,7 @@ part of 'local_image.dart';
 LocalImage _$LocalImageFromJson(Map<String, dynamic> json) {
   return LocalImage(
     json['id'] as String,
-    json['creationDate'] as String,
+    json['creationDate'] as num,
     json['pixelWidth'] as int,
     json['pixelHeight'] as int,
     json['lon'] as num,
