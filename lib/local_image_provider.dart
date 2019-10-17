@@ -19,18 +19,20 @@ class LocalImageProvider {
       LocalImageProvider.withMethodChannel(lipChannel);
   final MethodChannel channel;
   bool _initWorked = false;
+
   factory LocalImageProvider() => _instance;
+
   @visibleForTesting
   LocalImageProvider.withMethodChannel(this.channel);
 
   /// True if [initialize] succeeded
   bool get isAvailable => _initWorked;
 
-  /// Initialize and request permission to use platform services. 
-  /// 
+  /// Initialize and request permission to use platform services.
+  ///
   /// If this returns false then either the user has denied permission
   /// to use the platform services or the services are not available
-  /// for some reason, possibly due to platform version. 
+  /// for some reason, possibly due to platform version.
   Future<bool> initialize() async {
     if (_initWorked) {
       return Future.value(_initWorked);
@@ -70,12 +72,17 @@ class LocalImageProvider {
   ///
   /// This list may be empty if there are no images on the device or the
   /// user has denied permission to see their local images.
-  Future<List<LocalImage>> findLatestAfterId(String albumId,int maxImages) async {
+  Future<List<LocalImage>> findLatestAfterId(String albumId, int maxImages,
+      {bool needLocation = true}) async {
     if (!_initWorked) {
       throw LocalImageProviderNotInitializedException();
     }
-    final List<dynamic> images =
-    await channel.invokeMethod('latest_images_after_id', {'albumId': albumId, 'maxImages': maxImages});
+    final List<dynamic> images = await channel.invokeMethod(
+        'latest_images_after_id', {
+      'albumId': albumId,
+      'maxImages': maxImages,
+      'needLocation': needLocation ? 1 : 0
+    });
     return _jsonToLocalImages(images);
   }
 
@@ -108,7 +115,7 @@ class LocalImageProvider {
     return photoBytes;
   }
 
-  List<LocalImage> _jsonToLocalImages( List<dynamic> jsonImages ) {
+  List<LocalImage> _jsonToLocalImages(List<dynamic> jsonImages) {
     return jsonImages.map((imageJson) {
       // print(photoJson);
       Map<String, dynamic> imageMap = jsonDecode(imageJson);

@@ -63,9 +63,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void switchAlbum(LocalAlbum album) async {
-    List<LocalImage> albumImages =
-        await localImageProvider.findImagesInAlbum(album.id, 100);
-//    List<LocalImage> albumImages = await localImageProvider.findLatest(100000);
+//    List<LocalImage> albumImages =
+//        await localImageProvider.findImagesInAlbum(album.id, 100);
+    List<LocalImage> albumImages = await localImageProvider.findLatest(100000);
     setState(() {
       _localImages.clear();
       _localImages.addAll(albumImages);

@@ -47,6 +47,9 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         MediaStore.Images.ImageColumns.TITLE,
         MediaStore.Images.ImageColumns.HEIGHT,
         MediaStore.Images.ImageColumns.WIDTH,
+        MediaStore.Images.ImageColumns.LONGITUDE,
+        MediaStore.Images.ImageColumns.LATITUDE,
+        MediaStore.Images.ImageColumns.DATA,
         MediaStore.MediaColumns._ID)
 
     companion object {
@@ -239,6 +242,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             val idColumn = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID)
             val lon = imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE)
             val lat = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.LATITUDE)
+            val path = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA)
             while (imageCursor.moveToNext()) {
                 val imgJson = JSONObject()
                 imgJson.put("title", imageCursor.getString(titleColumn))
@@ -248,8 +252,9 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 val takenOn = Date(imageCursor.getLong(dateColumn))
                 val isoDate = isoFormatter.format(takenOn)
                 imgJson.put("creationDate", isoDate)
-                imgJson.put("lon",lon)
-                imgJson.put("lat",lat)
+                imgJson.put("lon",imageCursor.getFloat(lon))
+                imgJson.put("lat",imageCursor.getFloat(lat))
+                imgJson.put("path",imageCursor.getFloat(path))
                 images.add(imgJson.toString())
             }
         }

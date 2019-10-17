@@ -7,3 +7,4 @@
 build/
 example/android/res/
 example/lib/generated/
+.idea
