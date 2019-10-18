@@ -147,20 +147,25 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
         return albumEncodings
     }
     
-    
+    //获取创建时间比最后一条time 大 的 num 条数据 （按时间倒序的所以比最后一条时间大 📷）
     private func getTargetImages( _time: Int,_num:Int,_locationNum:Int, _ result: @escaping FlutterResult) {
         
         let date = SwiftLocalImageProviderPlugin.timeStampToDate(time: _time)
         let allPhotosOptions = PHFetchOptions()
         allPhotosOptions.fetchLimit = _num
         var p: NSPredicate?
-        if (_locationNum == 1) {
-            p = NSPredicate(format: "mediaType = %d AND creationDate < %@  AND location != null", PHAssetMediaType.image.rawValue,date)
+        
+//        let location = CLLocation(latitude: 0, longitude: 0)
+//        let locationPredicate = NSPredicate(format: "distanceToLocation:fromLocation:(%K,%@) < %f", "location", location as CLLocation, 1000)
+        
+        if (_time == 0) {
+            p = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
         } else {
-            p = NSPredicate(format: "mediaType = %d AND creationDate < %@", PHAssetMediaType.image.rawValue,date)
+            p = NSPredicate(format: "mediaType = %d AND creationDate < %@", PHAssetMediaType.image.rawValue,date as NSDate )
         }
+        //[CKLocationSortDescriptor(key: "location", relativeLocation: location)] 按地点排序
         allPhotosOptions.predicate = p
-        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]//降序
         let allPhotos = PHAsset.fetchAssets(with: allPhotosOptions)
         let photos = imagesToJson( allPhotos )
         result( photos )
@@ -276,12 +281,13 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
         return dateSt
     }
     
-    static func timeStampToDate(time:Int)->String {
-        let df = ISO8601DateFormatter()
-        let dateString = String(time/1000)
-        let date = df.date(from: dateString)
-        
-        return df.string(from: date!)// "2018-01-23T03:06:46.232Z"
+    static func timeStampToDate(time:Int)->Date {
+        if (time == 0) {return Date()}
+//        let df = ISO8601DateFormatter()
+//        let dateString = String(time/1000)
+//        let date = df.date(from: dateString)
+        let date = Date(timeIntervalSince1970:TimeInterval(time/1000))
+        return date// "2018-01-23T03:06:46.232Z"
     }
     
 }
