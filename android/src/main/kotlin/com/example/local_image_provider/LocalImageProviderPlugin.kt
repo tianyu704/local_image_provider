@@ -8,7 +8,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.graphics.Bitmap
 import android.net.Uri
+import android.nfc.Tag
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.flutter.plugin.common.MethodCall
@@ -244,6 +246,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         if (isNotInitialized(result)) {
             return
         }
+        var albumId = findCameraAlbumId()
         Thread(Runnable {
             val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC LIMIT $num"
@@ -251,14 +254,14 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 }
                 selectionArgs = arrayOf("$time")
             } else {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
@@ -271,6 +274,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         if (isNotInitialized(result)) {
             return
         }
+        var albumId = findCameraAlbumId()
         Thread(Runnable {
             val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
@@ -278,14 +282,14 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 }
                 selectionArgs = arrayOf("$time")
             } else {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
@@ -298,6 +302,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         if (isNotInitialized(result)) {
             return
         }
+        var albumId = findCameraAlbumId()
         Thread(Runnable {
             val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
@@ -305,20 +310,56 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
                 }
                 selectionArgs = arrayOf("$time")
             } else {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = $albumId AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
             val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
+    }
+
+    private fun findCameraAlbumId(): String {
+        val mediaColumns = arrayOf(
+                "DISTINCT " + MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.ImageColumns.BUCKET_ID
+        )
+        val mediaResolver = pluginActivity.contentResolver
+        val selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
+        var albumId = ""
+
+        val imageCursor = mediaResolver.query(MediaStore.Images.Media.INTERNAL_CONTENT_URI, mediaColumns, selection,
+                null, null)
+        imageCursor?.use {
+            val idColumn = imageCursor.getColumnIndexOrThrow(
+                    MediaStore.Images.ImageColumns.BUCKET_ID)
+            while (imageCursor.moveToNext()) {
+                albumId = imageCursor.getString(idColumn)
+                Log.e("albumId",albumId)
+                return albumId
+            }
+        }
+        if (albumId == "") {
+            val imageCursor = mediaResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaColumns, selection,
+                    null, null)
+            imageCursor?.use {
+                val idColumn = imageCursor.getColumnIndexOrThrow(
+                        MediaStore.Images.ImageColumns.BUCKET_ID)
+                while (imageCursor.moveToNext()) {
+                    albumId = imageCursor.getString(idColumn)
+                    Log.e("albumId",albumId)
+                    return albumId
+                }
+            }
+        }
+        return albumId
     }
 
     private fun findImagesInAlbum(albumId: String, maxImages: Int, result: Result) {
