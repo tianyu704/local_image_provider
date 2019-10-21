@@ -15,6 +15,7 @@ LocalImage _$LocalImageFromJson(Map<String, dynamic> json) {
     json['lon'] as num,
     json['lat'] as num,
     json['path'] as String,
+    json['bytes'] as Uint8List,
   );
 }
 
@@ -27,4 +28,5 @@ Map<String, dynamic> _$LocalImageToJson(LocalImage instance) =>
       'lon': instance.lon,
       'lat': instance.lat,
       'path': instance.path,
+      'bytes': instance.bytes,
     };
