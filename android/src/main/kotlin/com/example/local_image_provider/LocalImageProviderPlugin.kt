@@ -251,14 +251,14 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 }
                 selectionArgs = arrayOf("$time")
             } else {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
@@ -278,14 +278,14 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 }
                 selectionArgs = arrayOf("$time")
             } else {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
@@ -305,14 +305,14 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
                 }
                 selectionArgs = arrayOf("$time")
             } else {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
