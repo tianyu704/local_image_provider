@@ -9,6 +9,7 @@ public enum LocalImageProviderMethods: String {
     case images_in_album
     case albums
     case unknown // just for testing
+    case latest_images_after_time //当前id 开始查 num条图片方法名
 }
 
 public enum LocalImageProviderErrors: String {
@@ -40,6 +41,20 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
             return
         }
         getAlbums( albumType, result)
+    case LocalImageProviderMethods.latest_images_after_time.rawValue:
+        guard let argsArr = call.arguments as? Dictionary<String,AnyObject>,
+            let time = argsArr["time"] as? Int,
+            let num = argsArr["num"] as? Int,
+            let needLocation = argsArr["needLocation"] as? Int
+            //
+            else {
+            result(FlutterError( code: LocalImageProviderErrors.missingOrInvalidArg.rawValue,
+                message:"Missing arg maxPhotos",
+                details: nil ))
+            return
+        }
+        getTargetImages(_time: time, _num: num, _locationNum: needLocation, result);
+ 
     case LocalImageProviderMethods.latest_images.rawValue:
         guard let maxImages = call.arguments as? Int else {
             result(FlutterError( code: LocalImageProviderErrors.missingOrInvalidArg.rawValue,
@@ -132,6 +147,30 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
         return albumEncodings
     }
     
+    //获取创建时间比最后一条time 大 的 num 条数据 （按时间倒序的所以比最后一条时间大 📷）
+    private func getTargetImages( _time: Int,_num:Int,_locationNum:Int, _ result: @escaping FlutterResult) {
+        
+        let date = SwiftLocalImageProviderPlugin.timeStampToDate(time: _time)
+        let allPhotosOptions = PHFetchOptions()
+        allPhotosOptions.fetchLimit = _num
+        var p: NSPredicate?
+        
+//        let location = CLLocation(latitude: 0, longitude: 0)
+//        let locationPredicate = NSPredicate(format: "distanceToLocation:fromLocation:(%K,%@) < %f", "location", location as CLLocation, 1000)
+        
+        if (_time == 0) {
+            p = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        } else {
+            p = NSPredicate(format: "mediaType = %d AND creationDate < %@", PHAssetMediaType.image.rawValue,date as NSDate )
+        }
+        //[CKLocationSortDescriptor(key: "location", relativeLocation: location)] 按地点排序
+        allPhotosOptions.predicate = p
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]//降序
+        let allPhotos = PHAsset.fetchAssets(with: allPhotosOptions)
+        let photos = imagesToJson( allPhotos )
+        result( photos )
+    }
+    
     private func getLatestImages( _ maxPhotos: Int, _ result: @escaping FlutterResult) {
         let allPhotosOptions = PHFetchOptions()
         allPhotosOptions.fetchLimit = maxPhotos
@@ -148,15 +187,24 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
             count: Int,
             stop: UnsafeMutablePointer<ObjCBool>) in
             
+            
+            
+            
             if object is PHAsset{
                 let asset = object as! PHAsset
+                
+    
                 let creationDate = df.string(from: asset.creationDate!);
+                let createDateInt = SwiftLocalImageProviderPlugin.stringToTimeStamp(stringTime: creationDate)
                 let assetJson = """
                 {"id":"\(asset.localIdentifier)",
-                "creationDate":"\(creationDate)",
+                "creationDate":\(createDateInt),
+                "lat":\(asset.location?.coordinate.latitude ?? 0),
+                "lon":\(asset.location?.coordinate.longitude ?? 0),
                 "pixelWidth":\(asset.pixelWidth),
                 "pixelHeight":\(asset.pixelHeight)}
                 """;
+                 
                 photosJson.append( assetJson )
             }
         }
@@ -220,4 +268,26 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
             }
         }
     }
+    
+    //系统时间转毫秒时间戳
+    static func stringToTimeStamp(stringTime:String)->Int {
+
+        let df = ISO8601DateFormatter()
+        let dateString = stringTime //df.string(from: Date()) // "2018-01-23T03:06:46.232Z"
+        let date = df.date(from: dateString)     // "2018-01-23 03:06:46 +0000\n"
+            
+        let dateStamp:TimeInterval = date!.timeIntervalSince1970 * 1000
+        let dateSt:Int = Int(dateStamp)
+        return dateSt
+    }
+    
+    static func timeStampToDate(time:Int)->Date {
+        if (time == 0) {return Date()}
+//        let df = ISO8601DateFormatter()
+//        let dateString = String(time/1000)
+//        let date = df.date(from: dateString)
+        let date = Date(timeIntervalSince1970:TimeInterval(time/1000))
+        return date// "2018-01-23T03:06:46.232Z"
+    }
+    
 }
