@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f9975ccb-d21c-4013-babd-89421f9e3511" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/.idea/libraries/Dart_SDK.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/lib/local_image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/lib/local_image.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/lib/local_image.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/local_image_provider/lib/local_image.g.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/local_image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/local_image.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/local_image.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/local_image.g.dart" afterDir="false" />
-    </list>
+    <list default="true" id="f9975ccb-d21c-4013-babd-89421f9e3511" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -57,7 +47,7 @@
         <entry file="file://$PROJECT_DIR$/ios/Classes/LocalImageProviderPlugin.m">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="120">
-              <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+              <caret line="8" selection-start-line="8" selection-end-line="8" />
             </state>
           </provider>
         </entry>
@@ -122,6 +112,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="io.flutter.reload.alreadyRun" value="true" />
     <property name="settings.editor.selected.configurable" value="dart.settings" />
   </component>
   <component name="RunDashboard">
@@ -161,11 +152,11 @@
       <window_info id="Capture Tool" order="6" />
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Dart Analysis" order="0" weight="0.32977304" />
-      <window_info anchor="bottom" id="Run" order="1" sideWeight="0.672466" weight="0.36081082" />
+      <window_info anchor="bottom" id="Run" order="1" sideWeight="0.67170954" weight="0.20135134" />
       <window_info anchor="bottom" id="TODO" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" />
       <window_info active="true" anchor="bottom" id="Terminal" order="4" sideWeight="0.60287446" visible="true" weight="0.37432432" />
-      <window_info anchor="bottom" id="Event Log" order="5" sideWeight="0.39712557" side_tool="true" visible="true" weight="0.37432432" />
+      <window_info anchor="bottom" id="Event Log" order="5" sideWeight="0.32829046" side_tool="true" weight="0.36081082" />
       <window_info anchor="bottom" id="Flutter Performance" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32972974" />
       <window_info anchor="right" id="Capture Analysis" order="0" />
@@ -220,7 +211,7 @@
     <entry file="file://$PROJECT_DIR$/ios/Classes/LocalImageProviderPlugin.m">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
-          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
         </state>
       </provider>
     </entry>
