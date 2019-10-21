@@ -20,7 +20,6 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -81,8 +80,27 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 if (time is Int) {
                     time = time.toLong()
                 }
-                getLatestImagesAfterId(time as Long, num as Int, needLocation as Int, result)
+                getLatestImagesAfterTime(time as Long, num as Int, needLocation as Int, result)
             }
+
+            "images_after_time" -> {
+                var time = call.argument<Any>("time")
+                val needLocation = call.argument<Int>("needLocation")
+                if (time is Int) {
+                    time = time.toLong()
+                }
+                getImagesAfterTime(time as Long, needLocation as Int, result)
+            }
+
+            "images_before_time" -> {
+                var time = call.argument<Any>("time")
+                val needLocation = call.argument<Int>("needLocation")
+                if (time is Int) {
+                    time = time.toLong()
+                }
+                getImagesBeforeTime(time as Long, needLocation as Int, result)
+            }
+
             "albums" -> {
                 if (null != call.arguments && call.arguments is Int) {
                     val localAlbumType = call.arguments as Int
@@ -222,7 +240,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         }).start()
     }
 
-    private fun getLatestImagesAfterId(time: Long, num: Int, needLocation: Int, result: Result) {
+    private fun getLatestImagesAfterTime(time: Long, num: Int, needLocation: Int, result: Result) {
         if (isNotInitialized(result)) {
             return
         }
@@ -233,14 +251,68 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 } else {
-                    selection = "${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 }
                 selectionArgs = arrayOf("$time")
             } else {
                 if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                }
+            }
+            val mediaResolver = pluginActivity.contentResolver
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
+            pluginActivity.runOnUiThread { result.success(images) }
+        }).start()
+    }
+
+    private fun getImagesAfterTime(time: Long, needLocation: Int, result: Result) {
+        if (isNotInitialized(result)) {
+            return
+        }
+        Thread(Runnable {
+            val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
+            var selection: String? = null
+            var selectionArgs: Array<String>? = null
+            if (time != 0L) {
+                if (needLocation == 1) {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                } else {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                }
+                selectionArgs = arrayOf("$time")
+            } else {
+                if (needLocation == 1) {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                }
+            }
+            val mediaResolver = pluginActivity.contentResolver
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
+            pluginActivity.runOnUiThread { result.success(images) }
+        }).start()
+    }
+
+    private fun getImagesBeforeTime(time: Long, needLocation: Int, result: Result) {
+        if (isNotInitialized(result)) {
+            return
+        }
+        Thread(Runnable {
+            val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC"
+            var selection: String? = null
+            var selectionArgs: Array<String>? = null
+            if (time != 0L) {
+                if (needLocation == 1) {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                } else {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
+                }
+                selectionArgs = arrayOf("$time")
+            } else {
+                if (needLocation == 1) {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = Camera AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver

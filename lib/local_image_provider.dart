@@ -83,6 +83,35 @@ class LocalImageProvider {
     return _jsonToLocalImages(images);
   }
 
+  /// Returns the newest images before [time] on the local camera album.
+  ///
+  /// This list may be empty if there are no images on the device or the
+  /// user has denied permission to see their local images.
+  Future<List<LocalImage>> findBeforeTime(
+      {num time = 0, bool needLocation = true}) async {
+    if (!_initWorked) {
+      throw LocalImageProviderNotInitializedException();
+    }
+    final List<dynamic> images = await channel.invokeMethod(
+        'images_before_time',
+        {'time': time, 'needLocation': needLocation ? 1 : 0});
+    return _jsonToLocalImages(images);
+  }
+
+  /// Returns the newest images after [time] on the local camera album.
+  ///
+  /// This list may be empty if there are no images on the device or the
+  /// user has denied permission to see their local images.
+  Future<List<LocalImage>> findAfterTime(
+      {num time = 0, bool needLocation = true}) async {
+    if (!_initWorked) {
+      throw LocalImageProviderNotInitializedException();
+    }
+    final List<dynamic> images = await channel.invokeMethod('images_after_time',
+        {'time': time, 'needLocation': needLocation ? 1 : 0});
+    return _jsonToLocalImages(images);
+  }
+
   /// Returns the images contained in the given album on the local device
   /// up to [maxImages] in length.
   ///
