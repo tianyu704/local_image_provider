@@ -18,7 +18,7 @@ class LocalImage {
   final num creationDate;
   final num lon;
   final num lat;
-  final Uint8List bytes;
+  Uint8List bytes;
 
   /// Only Android
   final String path;
