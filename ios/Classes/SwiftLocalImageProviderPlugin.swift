@@ -10,6 +10,8 @@ public enum LocalImageProviderMethods: String {
     case albums
     case unknown // just for testing
     case latest_images_after_time //当前id 开始查 num条图片方法名
+    case images_before_time       //⚠️查询结果都是按时间倒叙
+    case images_after_time        //⚠️查询结果都是按时间倒叙
 }
 
 public enum LocalImageProviderErrors: String {
@@ -54,7 +56,30 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
             return
         }
         getTargetImages(_time: time, _num: num, _locationNum: needLocation, result);
- 
+    case LocalImageProviderMethods.images_after_time.rawValue:
+        guard let argsArr = call.arguments as? Dictionary<String,AnyObject>,
+                   let time = argsArr["time"] as? Int,
+                   let needLocation = argsArr["needLocation"] as? Int
+                   //
+                   else {
+                   result(FlutterError( code: LocalImageProviderErrors.missingOrInvalidArg.rawValue,
+                       message:"Missing arg maxPhotos",
+                       details: nil ))
+                   return
+               }
+        getTimeBeforeOrAfterImages(_isAfter: true, _time: time, _locationNum: needLocation, result)
+    case LocalImageProviderMethods.images_before_time.rawValue:
+        guard let argsArr = call.arguments as? Dictionary<String,AnyObject>,
+                   let time = argsArr["time"] as? Int,
+                   let needLocation = argsArr["needLocation"] as? Int
+                   //
+                   else {
+                   result(FlutterError( code: LocalImageProviderErrors.missingOrInvalidArg.rawValue,
+                       message:"Missing arg maxPhotos",
+                       details: nil ))
+                   return
+               }
+        getTimeBeforeOrAfterImages(_isAfter: false, _time: time, _locationNum: needLocation, result)
     case LocalImageProviderMethods.latest_images.rawValue:
         guard let maxImages = call.arguments as? Int else {
             result(FlutterError( code: LocalImageProviderErrors.missingOrInvalidArg.rawValue,
@@ -146,7 +171,21 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
         }
         return albumEncodings
     }
-    
+    private func getTimeBeforeOrAfterImages(_isAfter:Bool,_time: Int, _locationNum:Int, _ result: @escaping FlutterResult) {
+      let date = SwiftLocalImageProviderPlugin.timeStampToDate(time: _time)
+      let allPhotosOptions = PHFetchOptions()
+      var p: NSPredicate?
+        if (_isAfter) {
+            p = NSPredicate(format: "mediaType = %d AND mediaSubtypes != %@ AND creationDate >= %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+        } else {
+            p = NSPredicate(format: "mediaType = %d AND mediaSubtypes != %@ AND creationDate < %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+        }
+        allPhotosOptions.predicate = p
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]//降序
+        let allPhotos = PHAsset.fetchAssets(with: allPhotosOptions)
+        let photos = imagesToJson( allPhotos )
+        result( photos )
+    }
     //获取创建时间比最后一条time 大 的 num 条数据 （按时间倒序的所以比最后一条时间大 📷）
     private func getTargetImages( _time: Int,_num:Int,_locationNum:Int, _ result: @escaping FlutterResult) {
         
@@ -159,9 +198,10 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
 //        let locationPredicate = NSPredicate(format: "distanceToLocation:fromLocation:(%K,%@) < %f", "location", location as CLLocation, 1000)
         
         if (_time == 0) {
-            p = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+            p = NSPredicate(format: "mediaType = %d AND mediaSubtypes != %@", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue)
+            
         } else {
-            p = NSPredicate(format: "mediaType = %d AND creationDate < %@", PHAssetMediaType.image.rawValue,date as NSDate )
+            p = NSPredicate(format: "mediaType = %d AND creationDate < %@ AND mediaSubtypes != %@", PHAssetMediaType.image.rawValue,date as NSDate,PHAssetMediaSubtype.photoScreenshot.rawValue)
         }
         //[CKLocationSortDescriptor(key: "location", relativeLocation: location)] 按地点排序
         allPhotosOptions.predicate = p
