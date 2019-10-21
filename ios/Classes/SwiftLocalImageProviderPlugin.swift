@@ -176,9 +176,9 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
       let allPhotosOptions = PHFetchOptions()
       var p: NSPredicate?
         if (_isAfter) {
-            p = NSPredicate(format: "mediaType = %d AND mediaSubtypes != %@ AND creationDate >= %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+            p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate >= %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
         } else {
-            p = NSPredicate(format: "mediaType = %d AND mediaSubtypes != %@ AND creationDate < %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+            p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate < %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
         }
         allPhotosOptions.predicate = p
         allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]//降序
@@ -198,10 +198,10 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
 //        let locationPredicate = NSPredicate(format: "distanceToLocation:fromLocation:(%K,%@) < %f", "location", location as CLLocation, 1000)
         
         if (_time == 0) {
-            p = NSPredicate(format: "mediaType = %d AND mediaSubtypes != %@", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue)
+            p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0)", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue)
             
         } else {
-            p = NSPredicate(format: "mediaType = %d AND creationDate < %@ AND mediaSubtypes != %@", PHAssetMediaType.image.rawValue,date as NSDate,PHAssetMediaSubtype.photoScreenshot.rawValue)
+            p = NSPredicate(format: "mediaType = %d AND creationDate < %@ AND NOT ((mediaSubtype & %d) != 0)", PHAssetMediaType.image.rawValue,date as NSDate,PHAssetMediaSubtype.photoScreenshot.rawValue)
         }
         //[CKLocationSortDescriptor(key: "location", relativeLocation: location)] 按地点排序
         allPhotosOptions.predicate = p
