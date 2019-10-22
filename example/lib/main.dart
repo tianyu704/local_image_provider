@@ -63,9 +63,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void switchAlbum(LocalAlbum album) async {
-//    List<LocalImage> albumImages =
-//        await localImageProvider.findImagesInAlbum(album.id, 100);
-    List<LocalImage> albumImages = await localImageProvider.findLatest(100000);
+    List<LocalImage> albumImages =
+        await localImageProvider.findImagesInAlbum(album.id, 100);
+//    List<LocalImage> albumImages = await localImageProvider.findLatest(10000);
     setState(() {
       _localImages.clear();
       _localImages.addAll(albumImages);
@@ -74,13 +74,18 @@ class _MyAppState extends State<MyApp> {
   }
 
   void switchImage(String imageId, String src) {
-    localImageProvider.imageBytes(imageId, 500, 500).then((img) {
-      setState(() {
-        _imgBytes = img;
-        _hasImage = true;
-        _imgSource = src;
-        _selectedId = imageId;
-      });
+    print("aaaaaaaaa=>$imageId");
+    localImageProvider.imageBytes(imageId, 200, 200).then((img) {
+      setState(
+        () {
+          _imgBytes = img;
+          _hasImage = true;
+          _imgSource = src;
+          _selectedId = imageId;
+        },
+      );
+    }, onError: (e) {
+      print("aaaaaaaaa=>$e");
     });
   }
 
@@ -116,7 +121,7 @@ class _MyAppState extends State<MyApp> {
                       children: _localImages
                           .map(
                             (img) => GestureDetector(
-                              onTap: () => switchImage(img.id, "Image"),
+                              onTap: () => switchImage(img.path, "Image"),
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),
                                 child: Text(
