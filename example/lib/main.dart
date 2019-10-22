@@ -74,19 +74,19 @@ class _MyAppState extends State<MyApp> {
   }
 
   void switchImage(String imageId, String src) {
-//    print("aaaaaaaaa=>$imageId");
-//    localImageProvider.imageBytes(imageId, 200, 200).then((img) {
-//      setState(
-//        () {
-//          _imgBytes = img;
-//          _hasImage = true;
-//          _imgSource = src;
-//          _selectedId = imageId;
-//        },
-//      );
-//    }, onError: (e) {
-//      print("aaaaaaaaa=>$e");
-//    });
+    print("aaaaaaaaa=>$imageId");
+    localImageProvider.imageBytes(imageId, 200, 200).then((img) {
+      setState(
+        () {
+          _imgBytes = img;
+          _hasImage = true;
+          _imgSource = src;
+          _selectedId = imageId;
+        },
+      );
+    }, onError: (e) {
+      print("aaaaaaaaa=>$e");
+    });
   }
 
   @override

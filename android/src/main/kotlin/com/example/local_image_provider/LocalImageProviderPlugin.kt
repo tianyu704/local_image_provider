@@ -7,6 +7,7 @@ import android.content.ContentResolver
 import android.content.pm.PackageManager
 import android.os.Build
 import android.graphics.Bitmap
+import android.media.ExifInterface
 import android.net.Uri
 import android.nfc.Tag
 import android.provider.MediaStore
@@ -238,7 +239,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             val imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val sortOrder = "${MediaStore.Images.ImageColumns.DATE_TAKEN} DESC LIMIT $maxResults"
             val mediaResolver = pluginActivity.contentResolver
-            val images = findImagesToJson(mediaResolver, imgUri, null, null, sortOrder)
+            val images = findImagesToJson(mediaResolver, imgUri, null, null, sortOrder, false)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
     }
@@ -254,21 +255,13 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
-                } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
-                }
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 selectionArgs = arrayOf("$time")
             } else {
-                if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
-                } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
-                }
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
             }
             val mediaResolver = pluginActivity.contentResolver
-            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder, needLocation == 1)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
     }
@@ -284,21 +277,13 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
-                } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
-                }
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 selectionArgs = arrayOf("$time")
             } else {
-                if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
-                } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
-                }
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
             }
             val mediaResolver = pluginActivity.contentResolver
-            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder, needLocation == 1)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
     }
@@ -314,21 +299,13 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ? AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
-                } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
-                }
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
                 selectionArgs = arrayOf("$time")
             } else {
-                if (needLocation == 1) {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
-                } else {
-                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'";
-                }
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
             }
             val mediaResolver = pluginActivity.contentResolver
-            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder, needLocation == 1)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
     }
@@ -379,13 +356,13 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             val selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = ?"
             val selectionArgs = arrayOf(albumId)
             val mediaResolver = pluginActivity.contentResolver
-            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder)
+            val images = findImagesToJson(mediaResolver, imgUri, selection, selectionArgs, sortOrder, false)
             pluginActivity.runOnUiThread { result.success(images) }
         }).start()
     }
 
     private fun findImagesToJson(mediaResolver: ContentResolver, imgUri: Uri, selection: String?,
-                                 selectionArgs: Array<String>?, sortOrder: String?):
+                                 selectionArgs: Array<String>?, sortOrder: String?, needLocation: Boolean):
             ArrayList<String> {
         val images = ArrayList<String>()
         val imageCursor = mediaResolver.query(imgUri, imageColums, selection,
@@ -399,6 +376,11 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             val lon = imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE)
             val lat = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.LATITUDE)
             val path = imageCursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA)
+            var exif: ExifInterface
+            var longitude: Double
+            var latitude: Double
+
+            var output = FloatArray(2)
             while (imageCursor.moveToNext()) {
                 val imgJson = JSONObject()
                 imgJson.put("title", imageCursor.getString(titleColumn))
@@ -406,10 +388,25 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 imgJson.put("pixelHeight", imageCursor.getInt(heightColumn))
                 imgJson.put("id", imageCursor.getString(idColumn))
                 imgJson.put("creationDate", imageCursor.getLong(dateColumn))
-                imgJson.put("lon", imageCursor.getDouble(lon))
-                imgJson.put("lat", imageCursor.getDouble(lat))
                 imgJson.put("path", imageCursor.getString(path))
-                images.add(imgJson.toString())
+                if (needLocation) {
+                    longitude = imageCursor.getDouble(lon)
+                    latitude = imageCursor.getDouble(lat)
+                    if (longitude == 0.0 && latitude == 0.0) {
+                        exif = ExifInterface(imgJson.get("path") as String)
+                        if (exif.getLatLong(output)) {
+                            imgJson.put("lon", output[1])
+                            imgJson.put("lat", output[0])
+                            images.add(imgJson.toString())
+                        }
+                    } else {
+                        imgJson.put("lon", imageCursor.getDouble(lon))
+                        imgJson.put("lat", imageCursor.getDouble(lat))
+                        images.add(imgJson.toString())
+                    }
+                } else {
+                    images.add(imgJson.toString())
+                }
             }
         }
         return images
