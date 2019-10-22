@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
     try {
       hasPermission = await localImageProvider.initialize();
       if (hasPermission) {
-        localImages = await localImageProvider.findAfterTime();
+        localImages = await localImageProvider.findAfterTime(needLocation: false);
         localAlbums = await localImageProvider.findAlbums(LocalAlbumType.all);
       }
     } on PlatformException catch (e) {
@@ -74,19 +74,19 @@ class _MyAppState extends State<MyApp> {
   }
 
   void switchImage(String imageId, String src) {
-    print("aaaaaaaaa=>$imageId");
-    localImageProvider.imageBytes(imageId, 200, 200).then((img) {
-      setState(
-        () {
-          _imgBytes = img;
-          _hasImage = true;
-          _imgSource = src;
-          _selectedId = imageId;
-        },
-      );
-    }, onError: (e) {
-      print("aaaaaaaaa=>$e");
-    });
+//    print("aaaaaaaaa=>$imageId");
+//    localImageProvider.imageBytes(imageId, 200, 200).then((img) {
+//      setState(
+//        () {
+//          _imgBytes = img;
+//          _hasImage = true;
+//          _imgSource = src;
+//          _selectedId = imageId;
+//        },
+//      );
+//    }, onError: (e) {
+//      print("aaaaaaaaa=>$e");
+//    });
   }
 
   @override

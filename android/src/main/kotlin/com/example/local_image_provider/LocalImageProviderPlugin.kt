@@ -263,6 +263,8 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             } else {
                 if (needLocation == 1) {
                     selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                } else {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
@@ -291,6 +293,8 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             } else {
                 if (needLocation == 1) {
                     selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                } else {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
@@ -319,6 +323,8 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             } else {
                 if (needLocation == 1) {
                     selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.LONGITUDE} != 0 AND ${MediaStore.Images.ImageColumns.LATITUDE} != 0"
+                } else {
+                    selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'";
                 }
             }
             val mediaResolver = pluginActivity.contentResolver
@@ -414,7 +420,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             return
         }
         Thread(Runnable {
-//            val imgUri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            //            val imgUri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
             val bitmapLoad = GlideApp.with(pluginActivity)
                     .asBitmap()
                     .load(path)
