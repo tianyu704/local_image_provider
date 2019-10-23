@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -41,7 +42,8 @@ class _MyAppState extends State<MyApp> {
     try {
       hasPermission = await localImageProvider.initialize();
       if (hasPermission) {
-        localImages = await localImageProvider.findAfterTime(needLocation: false);
+        localImages =
+            await localImageProvider.findAfterTime(needLocation: false);
         localAlbums = await localImageProvider.findAlbums(LocalAlbumType.all);
       }
     } on PlatformException catch (e) {
@@ -70,7 +72,8 @@ class _MyAppState extends State<MyApp> {
       _localImages.clear();
       _localImages.addAll(albumImages);
     });
-    switchImage(album.coverImgId, 'Album');
+    switchImage(
+        Platform.isAndroid ? albumImages[0].path : albumImages[0].id, 'Album');
   }
 
   void switchImage(String imageId, String src) {
@@ -121,7 +124,9 @@ class _MyAppState extends State<MyApp> {
                       children: _localImages
                           .map(
                             (img) => GestureDetector(
-                              onTap: () => switchImage(img.path, "Image"),
+                              onTap: () => switchImage(
+                                  Platform.isAndroid ? img.path : img.id,
+                                  "Image"),
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),
                                 child: Text(

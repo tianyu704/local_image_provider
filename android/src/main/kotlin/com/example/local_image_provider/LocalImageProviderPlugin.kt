@@ -22,6 +22,7 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import kotlin.collections.ArrayList
 
@@ -393,11 +394,15 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                     longitude = imageCursor.getDouble(lon)
                     latitude = imageCursor.getDouble(lat)
                     if (longitude == 0.0 && latitude == 0.0) {
-                        exif = ExifInterface(imgJson.get("path") as String)
-                        if (exif.getLatLong(output)) {
-                            imgJson.put("lon", output[1])
-                            imgJson.put("lat", output[0])
-                            images.add(imgJson.toString())
+                        try {
+                            exif = ExifInterface(imgJson.get("path") as String)
+                            if (exif != null && exif.getLatLong(output)) {
+                                imgJson.put("lon", output[1])
+                                imgJson.put("lat", output[0])
+                                images.add(imgJson.toString())
+                            }
+                        } catch (e: Exception) {
+                            Log.e("Exception", e.localizedMessage)
                         }
                     } else {
                         imgJson.put("lon", imageCursor.getDouble(lon))
