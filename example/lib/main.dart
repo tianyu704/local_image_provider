@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -41,7 +42,8 @@ class _MyAppState extends State<MyApp> {
     try {
       hasPermission = await localImageProvider.initialize();
       if (hasPermission) {
-        localImages = await localImageProvider.findLatestAfterTime();
+        localImages =
+            await localImageProvider.findAfterTime(needLocation: false);
         localAlbums = await localImageProvider.findAlbums(LocalAlbumType.all);
       }
     } on PlatformException catch (e) {
@@ -63,24 +65,30 @@ class _MyAppState extends State<MyApp> {
   }
 
   void switchAlbum(LocalAlbum album) async {
-//    List<LocalImage> albumImages =
-//        await localImageProvider.findImagesInAlbum(album.id, 100);
-    List<LocalImage> albumImages = await localImageProvider.findLatest(100000);
+    List<LocalImage> albumImages =
+        await localImageProvider.findImagesInAlbum(album.id, 100);
+//    List<LocalImage> albumImages = await localImageProvider.findLatest(10000);
     setState(() {
       _localImages.clear();
       _localImages.addAll(albumImages);
     });
-    switchImage(album.coverImgId, 'Album');
+    switchImage(
+        Platform.isAndroid ? albumImages[0].path : albumImages[0].id, 'Album');
   }
 
   void switchImage(String imageId, String src) {
-    localImageProvider.imageBytes(imageId, 500, 500).then((img) {
-      setState(() {
-        _imgBytes = img;
-        _hasImage = true;
-        _imgSource = src;
-        _selectedId = imageId;
-      });
+    print("aaaaaaaaa=>$imageId");
+    localImageProvider.imageBytes(imageId, 200, 200).then((img) {
+      setState(
+        () {
+          _imgBytes = img;
+          _hasImage = true;
+          _imgSource = src;
+          _selectedId = imageId;
+        },
+      );
+    }, onError: (e) {
+      print("aaaaaaaaa=>$e");
     });
   }
 
@@ -116,7 +124,9 @@ class _MyAppState extends State<MyApp> {
                       children: _localImages
                           .map(
                             (img) => GestureDetector(
-                              onTap: () => switchImage(img.id, "Image"),
+                              onTap: () => switchImage(
+                                  Platform.isAndroid ? img.path : img.id,
+                                  "Image"),
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 5),
                                 child: Text(

@@ -179,9 +179,9 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
              p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0)", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue)
         } else {
             if (_isAfter) {
-                p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate > %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+                p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate >= %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
             } else {
-                p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate < %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+                p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate <= %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
             }
         }
         allPhotosOptions.predicate = p
