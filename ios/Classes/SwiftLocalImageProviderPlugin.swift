@@ -175,10 +175,14 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
       let date = SwiftLocalImageProviderPlugin.timeStampToDate(time: _time)
       let allPhotosOptions = PHFetchOptions()
       var p: NSPredicate?
-        if (_isAfter) {
-            p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate >= %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+        if (_time == 0) {
+             p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0)", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue)
         } else {
-            p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate < %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+            if (_isAfter) {
+                p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate > %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+            } else {
+                p = NSPredicate(format: "mediaType = %d AND NOT ((mediaSubtype & %d) != 0) AND creationDate < %@ ", PHAssetMediaType.image.rawValue,PHAssetMediaSubtype.photoScreenshot.rawValue,date as NSDate)
+            }
         }
         allPhotosOptions.predicate = p
         allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]//降序
