@@ -265,7 +265,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
                 selectionArgs = arrayOf("$time")
             } else {
                 selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
@@ -287,7 +287,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
                 selectionArgs = arrayOf("$time")
             } else {
                 selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
@@ -309,7 +309,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 selectionArgs = arrayOf("$time")
             } else {
                 selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
