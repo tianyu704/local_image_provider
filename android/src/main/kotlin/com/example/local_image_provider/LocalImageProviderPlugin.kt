@@ -85,6 +85,9 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 if (time is Int) {
                     time = time.toLong()
                 }
+                if (time is Double) {
+                    time = time.toLong()
+                }
                 getLatestImagesAfterTime(time as Long, num as Int, needLocation as Int, result)
             }
 
@@ -94,6 +97,9 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 if (time is Int) {
                     time = time.toLong()
                 }
+                if (time is Double) {
+                    time = time.toLong()
+                }
                 getImagesAfterTime(time as Long, needLocation as Int, result)
             }
 
@@ -101,6 +107,9 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 var time = call.argument<Any>("time")
                 val needLocation = call.argument<Int>("needLocation")
                 if (time is Int) {
+                    time = time.toLong()
+                }
+                if (time is Double) {
                     time = time.toLong()
                 }
                 getImagesBeforeTime(time as Long, needLocation as Int, result)
@@ -256,7 +265,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
                 selectionArgs = arrayOf("$time")
             } else {
                 selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
@@ -278,7 +287,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
                 selectionArgs = arrayOf("$time")
             } else {
                 selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
@@ -300,7 +309,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             var selection: String? = null
             var selectionArgs: Array<String>? = null
             if (time != 0L) {
-                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} > ?"
+                selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera' AND ${MediaStore.Images.ImageColumns.DATE_TAKEN} < ?"
                 selectionArgs = arrayOf("$time")
             } else {
                 selection = "${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME} = 'Camera'"
