@@ -85,7 +85,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 if (time is Int) {
                     time = time.toLong()
                 }
-                getLatestImagesAfterTime(time as Long, num as Int, needLocation as Int, result)
+                getLatestImagesAfterTime(time as Double, num as Int, needLocation as Int, result)
             }
 
             "images_after_time" -> {
@@ -94,7 +94,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                 if (time is Int) {
                     time = time.toLong()
                 }
-                getImagesAfterTime(time as Long, needLocation as Int, result)
+                getImagesAfterTime(time as Double, needLocation as Int, result)
             }
 
             "images_before_time" -> {
@@ -267,7 +267,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         }).start()
     }
 
-    private fun getImagesAfterTime(time: Long, needLocation: Int, result: Result) {
+    private fun getImagesAfterTime(time: Double, needLocation: Int, result: Result) {
         if (isNotInitialized(result)) {
             return
         }
@@ -289,7 +289,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
         }).start()
     }
 
-    private fun getImagesBeforeTime(time: Long, needLocation: Int, result: Result) {
+    private fun getImagesBeforeTime(time: Double, needLocation: Int, result: Result) {
         if (isNotInitialized(result)) {
             return
         }
