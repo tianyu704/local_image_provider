@@ -136,9 +136,12 @@ class LocalImageProvider {
     if (!_initWorked) {
       throw LocalImageProviderNotInitializedException();
     }
-    final Uint8List photoBytes = await channel.invokeMethod(
+    final photoBytes = await channel.invokeMethod(
         'image_bytes', {'id': id, 'pixelHeight': height, 'pixelWidth': width});
-    return photoBytes;
+    if (photoBytes is Uint8List) {
+      return photoBytes;
+    }
+    return null;
   }
 
   List<LocalImage> _jsonToLocalImages(List<dynamic> jsonImages) {

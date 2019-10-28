@@ -446,8 +446,8 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, jpegBytes)
                     pluginActivity.runOnUiThread { result.success(jpegBytes.toByteArray()) }
                 }
-            } catch (e) {
-
+            } catch (e:Exception) {
+                result.success("")
             }
         }).start()
     }
