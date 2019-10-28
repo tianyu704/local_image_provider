@@ -22,6 +22,7 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import kotlin.collections.ArrayList
@@ -431,22 +432,22 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
             return
         }
         Thread(Runnable {
-            //            val imgUri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-            val bitmapLoad = GlideApp.with(pluginActivity)
-                    .asBitmap()
-                    .load(path)
-                    .override(width, height)
-                    .fitCenter()
-                    .submit()
-
-            try {
+            var file = File(path)
+            if(file.exists()){
+                //            val imgUri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                val bitmapLoad = GlideApp.with(pluginActivity)
+                        .asBitmap()
+                        .load(path)
+                        .override(width, height)
+                        .fitCenter()
+                        .submit()
                 val bitmap = bitmapLoad.get()
                 val jpegBytes = ByteArrayOutputStream()
                 jpegBytes.use {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, jpegBytes)
                     pluginActivity.runOnUiThread { result.success(jpegBytes.toByteArray()) }
                 }
-            } catch (e:Exception) {
+            }else{
                 result.success("")
             }
         }).start()
