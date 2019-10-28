@@ -438,11 +438,16 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                     .override(width, height)
                     .fitCenter()
                     .submit()
-            val bitmap = bitmapLoad.get()
-            val jpegBytes = ByteArrayOutputStream()
-            jpegBytes.use {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 70, jpegBytes)
-                pluginActivity.runOnUiThread { result.success(jpegBytes.toByteArray()) }
+
+            try {
+                val bitmap = bitmapLoad.get()
+                val jpegBytes = ByteArrayOutputStream()
+                jpegBytes.use {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, jpegBytes)
+                    pluginActivity.runOnUiThread { result.success(jpegBytes.toByteArray()) }
+                }
+            } catch (e) {
+                return
             }
         }).start()
     }
