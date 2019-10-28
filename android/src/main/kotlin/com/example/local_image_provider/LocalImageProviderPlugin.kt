@@ -448,7 +448,7 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                     pluginActivity.runOnUiThread { result.success(jpegBytes.toByteArray()) }
                 }
             }else{
-                result.success("")
+                pluginActivity.runOnUiThread { result.success("") }
             }
         }).start()
     }
