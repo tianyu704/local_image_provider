@@ -12,6 +12,7 @@ public enum LocalImageProviderMethods: String {
     case latest_images_after_time //当前id 开始查 num条图片方法名
     case images_before_time       //⚠️查询结果都是按时间倒叙
     case images_after_time        //⚠️查询结果都是按时间倒叙
+    case image_exists             //根据图片id 判断图片是否存在
 }
 
 public enum LocalImageProviderErrors: String {
@@ -111,6 +112,14 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
                 return
         }
         getPhotoImage( localId, width, height, result)
+    case LocalImageProviderMethods.image_exists.rawValue:
+        guard let localId = call.arguments as? String else {
+            result(FlutterError( code: LocalImageProviderErrors.imgNotFound.rawValue,
+                message:"img not found",
+                details: nil ))
+            return
+        }
+        getPhotoImageExist(localId, result)
     default:
         print("Unrecognized method: \(call.method)")
         result( FlutterMethodNotImplemented)
@@ -273,6 +282,11 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
        result( photos )
     }
 
+    private func getPhotoImageExist(_ id: String,_ flutterResult: @escaping FlutterResult) {
+        let fetchOptions = PHFetchOptions()
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: fetchOptions )
+        flutterResult(1 == fetchResult.count)
+    }
     private func getPhotoImage(_ id: String, _ pixelHeight: Int, _ pixelWidth: Int, _ flutterResult: @escaping FlutterResult) {
         let fetchOptions = PHFetchOptions()
         let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: fetchOptions )

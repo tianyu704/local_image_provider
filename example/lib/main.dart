@@ -189,4 +189,12 @@ class _MyAppState extends State<MyApp> {
     _localImages.addAll(more);
     setState(() {});
   }
+
+  void _loadMore1() async {
+    if (_localImages != null && _localImages.length > 0) {
+      LocalImage image = _localImages.first;
+      bool isFlage = await localImageProvider.imageExists(image.id);
+      print("${isFlage}");
+    }
+  }
 }
