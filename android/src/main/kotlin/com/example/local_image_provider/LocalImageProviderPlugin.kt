@@ -146,6 +146,11 @@ class LocalImageProviderPlugin(activity: Activity) : MethodCallHandler,
                             "Missing arg requires albumId, maxImages", null)
                 }
             }
+            "image_exists" ->{
+                val path = call.arguments as String
+                var file = File(path)
+                result.success(file.exists())
+            }
             else -> result.notImplemented()
         }
     }

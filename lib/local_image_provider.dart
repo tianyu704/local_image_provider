@@ -144,6 +144,13 @@ class LocalImageProvider {
     return null;
   }
 
+  Future<bool> imageExists(String id)async{
+    if (!_initWorked) {
+      throw LocalImageProviderNotInitializedException();
+    }
+    return await channel.invokeMethod("image_exists",id);
+  }
+
   List<LocalImage> _jsonToLocalImages(List<dynamic> jsonImages) {
     return jsonImages.map((imageJson) {
       // print(photoJson);
