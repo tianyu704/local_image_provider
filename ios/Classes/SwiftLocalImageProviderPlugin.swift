@@ -307,10 +307,10 @@ public class SwiftLocalImageProviderPlugin: NSObject, FlutterPlugin {
                 }
                 if let image = result {
         
-                    let nsdata = SwiftLocalImageProviderPlugin.resetSizeOfImageData(sourceImage: image, maxSize: 30)
-                    let data = Data(referencing: nsdata)
-                    //let data =UIImageJPEGRepresentation(image, 0.7 );
-                    let typedData = FlutterStandardTypedData( bytes: data );
+//                    let nsdata = SwiftLocalImageProviderPlugin.resetSizeOfImageData(sourceImage: image, maxSize: 30)
+//                    let data = Data(referencing: nsdata)
+                    let data = UIImageJPEGRepresentation(image, 0.6 );
+                    let typedData = FlutterStandardTypedData( bytes: data! );
                     DispatchQueue.main.async {
                         flutterResult( typedData)
                     }
